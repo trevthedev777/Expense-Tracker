@@ -16,6 +16,36 @@ const dummyTransactions = [
 
 let transactions = dummyTransactions;
 
+
+// Add Transaction
+function addTransaction(e) {
+    e.preventDefault();
+
+    if (text.value.trim() === "" || amount.value.trim() === "") {
+        alert("Please enter a text and/or amount value")
+    } else {
+        const transaction = {
+            id: generateID(),
+            text: text.value,
+            amount: +amount.value
+        }
+
+        transactions.push(transaction);
+
+        addTransactionDOM(transaction);
+
+        updateValues();
+
+        text.value = "";
+        amount.value = "";
+    }
+};
+
+// Generate Random ID
+function generateID() {
+    return Math.floor(Math.random() *  100000000 );
+}
+
 // Add transactions to DOM list
 function addTransactionDOM(transaction) {
     // Get The Sign
@@ -31,7 +61,7 @@ function addTransactionDOM(transaction) {
         <span>
             ${sign}${Math.abs(transaction.amount)}
         </span>
-        <button class="deleteBtn">x</button>
+        <button class="delete-btn" onClick="removeTransaction(${transaction.id})">x</button>
     `
 
     list.appendChild(item);
@@ -42,7 +72,8 @@ function updateValues() {
     const amounts = transactions
                     .map(transaction => transaction.amount);
                     
-    const total = amounts.reduce((acc, item) => (acc += item), 0)
+    const total = amounts
+                  .reduce((acc, item) => (acc += item), 0)
                   .toFixed(2);
 
     const income = amounts
@@ -50,10 +81,10 @@ function updateValues() {
                    .reduce((acc, item) => (acc += item), 0)
                    .toFixed(2);
 
-    const expense = amounts
+    const expense = (amounts
                    .filter(item => item < 0)
                    .reduce((acc, item) => (acc += item), 0)
-                   * -(1)
+                   * -1)
                    .toFixed(2);
 
     
@@ -61,6 +92,13 @@ function updateValues() {
     moneyPlus.innerText = `$${income}`;
     moneyMinus.innerText = `$${expense}`;
 };
+
+// Remove transaction By ID
+function removeTransaction(id) {
+    transactions = transactions.filter(transaction => transaction.id !== id);
+
+    init();
+}
 
 // Init App
 function init() {
@@ -70,3 +108,7 @@ function init() {
 }
 
 init();
+
+
+// Event Listeners
+form.addEventListener("submit", addTransaction);
